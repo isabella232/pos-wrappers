@@ -39,7 +39,7 @@ contract WithdrawToWrapperRoot {
         );
         // contract -> user
 
-        require(IRootToken(rootToken).transferFrom(address(this), destination, amount), "TRANSFER_FAILED");
+        require(IRootToken(rootToken).transfer(destination, amount), "TRANSFER_FAILED");
     }
 
     function _validateAndExtractMessage(bytes memory inputData) internal returns (bytes memory) {
