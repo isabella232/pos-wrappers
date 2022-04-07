@@ -25,12 +25,12 @@ module.exports = {
   solidity: "0.8.13",
   networks: {
     goerli: {
-      url: process.env.GOERLI_URL || "",
+      url: process.env.GOERLI_URL || "https://rpc.goerli.mudit.blog",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     mumbai: {
-      url: process.env.MUMBAI_URL || "",
+      url: process.env.MUMBAI_URL || "https://rpc-mumbai.maticvigil.com",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
