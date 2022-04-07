@@ -22,7 +22,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.13",
+  solidity: {
+    version: "0.8.13",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 9999,
+      },
+    },
+  },
   networks: {
     goerli: {
       url: process.env.GOERLI_URL || "https://rpc.goerli.mudit.blog",
