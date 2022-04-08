@@ -29,9 +29,14 @@ contract WithdrawToWrapperRoot {
         rootChainManager = _rootChainManager;
     }
 
-    function exit(bytes calldata _burnProof, bytes calldata _messageProof) external {
+    function exit(bytes calldata _burnProof, uint8 offset) external {
         rootChainManager.exit(_burnProof);
         // token -> contract
+
+        bytes memory _messageProof = abi.encodePacked(
+            _burnProof[:_burnProof.length - 1],
+            uint8(_burnProof[_burnProof.length - 1]) + offset
+        );
 
         (address rootToken, , uint256 amount, address destination) = abi.decode(
             _validateAndExtractMessage(_messageProof),
