@@ -17,5 +17,6 @@ jobs:
           node-version: "16.x"
       - run: npm install
       - run: npx hardhat compile --show-stack-traces
+      - run: npx hardhat test
       - run: npx solhint "contracts/**/*.sol"
       - run: npx prettier -c "contracts/**/*.sol"
