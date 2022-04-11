@@ -1,42 +1,35 @@
-# Advanced Sample Hardhat Project
+# PoS Wrapper Contracts
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+These contracts enable anyone to withdraw using the PoS bridge to specific addresses on the root chain. We leverage the
+PoS bridge and special `MessageSent` events to communicate between two contracts with the same address.
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+These contracts are mostly intended for multisigs (like Gnosis safes) who cannot use the PoS bridge as it withdraws to
+the same address, this is resolved using another event in conjunction to communicate the destination address.
 
-Try running some of the following tasks:
+## Deploying contracts
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.js
-node scripts/deploy.js
-npx eslint '**/*.js'
-npx eslint '**/*.js' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+### Set environment variables
+Create a `.env` with your private key, similar to `.env.example`:
+```
+ETHERSCAN_API_KEY=ABC123ABC123ABC123ABC123ABC123ABC1
+ROPSTEN_URL=https://eth-ropsten.alchemyapi.io/v2/<YOUR ALCHEMY KEY>
+PRIVATE_KEY=0xabc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc1
 ```
 
-# Etherscan verification
+### Deployments
+Run `deploy.sh` to deploy contracts on both chains, alternatively, you can use the specific deployment scripts. Keep
+in mind that the contracts must be deployed to the same address on both chains to work properly, you can leverage the
+`CREATE` opcode with the same deployer address and nonce.
 
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/deploy.js
+For example,
+```bash
+./scripts/deploy.sh
 ```
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
+or
 
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
+```bash
+npx run --network goerli scripts/deployroot.js
+
+npx run --network mumbai scripts/deploychild.js
 ```
