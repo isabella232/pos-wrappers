@@ -9,6 +9,11 @@ import "./lib/IRootChain.sol";
 import "./lib/IRootChainManager.sol";
 import "./lib/IRootToken.sol";
 
+/// @title Withdraw To Wrapper (Root) for Polygon PoS
+/// @author QEDK
+/// @notice This contract enables withdrawals on the root chain for Polygon PoS to specific addresses using the
+/// `MessageSent` event.
+/// @custom:experimental This is an experimental contract.
 contract WithdrawToWrapperRoot {
     using RLPReader for RLPReader.RLPItem;
     using Merkle for bytes32;
@@ -20,7 +25,8 @@ contract WithdrawToWrapperRoot {
     IRootChainManager public immutable rootChainManager;
     IRootChain public immutable rootChain;
 
-    bytes32 private constant SEND_MESSAGE_EVENT_SIG = 0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036;
+    bytes32 private constant SEND_MESSAGE_EVENT_SIG =
+        0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036;
 
     mapping(bytes32 => bool) public processedExits;
 
@@ -29,9 +35,12 @@ contract WithdrawToWrapperRoot {
         rootChainManager = _rootChainManager;
     }
 
+    /// @notice Allows for special exits using PoS burn proof and an offset.
+    /// @dev We use the offset to read the log of the MessageSent event.
+    /// @param _burnProof Proof of a Pos burn event (see more below)
+    /// @param offset Offset of the MessageSent relative to the burn event
     function exit(bytes calldata _burnProof, uint8 offset) external {
-        rootChainManager.exit(_burnProof);
-        // token -> contract
+        rootChainManager.exit(_burnProof); // token -> contract
 
         bytes memory _messageProof = abi.encodePacked(
             _burnProof[:_burnProof.length - 1],
@@ -42,13 +51,33 @@ contract WithdrawToWrapperRoot {
             _validateAndExtractMessage(_messageProof),
             (address, address, uint256, address)
         );
-        // contract -> user
 
-        require(IRootToken(rootToken).transfer(destination, amount), "TRANSFER_FAILED");
+        require(
+            IRootToken(rootToken).transfer(destination, amount),
+            "TRANSFER_FAILED"
+        ); // contract -> user
     }
 
-    function _validateAndExtractMessage(bytes memory inputData) internal returns (bytes memory) {
-        ExitPayloadReader.ExitPayload memory payload = inputData.toExitPayload();
+    /* @notice Internal function that we use to read and verify the MessageSent event from RootChain contract
+     * @param inputData RLP encoded data of the MessageSent tx containing following list of fields
+     *  0 - headerNumber - Checkpoint header block number containing the reference tx
+     *  1 - blockProof - Proof that the block header (in the child chain) is a leaf in the submitted merkle root
+     *  2 - blockNumber - Block number containing the reference tx on child chain
+     *  3 - blockTime - Reference tx block time
+     *  4 - txRoot - Transactions root of block
+     *  5 - receiptRoot - Receipts root of block
+     *  6 - receipt - Receipt of the reference transaction
+     *  7 - receiptProof - Merkle proof of the reference receipt
+     *  8 - branchMask - 32 bits denoting the path of receipt in merkle tree
+     *  9 - receiptLogIndex - Log Index to read from the receipt
+     * @return Returns the decoded log event of the `MessageSent` event
+     */
+    function _validateAndExtractMessage(bytes memory inputData)
+        internal
+        returns (bytes memory)
+    {
+        ExitPayloadReader.ExitPayload memory payload = inputData
+            .toExitPayload();
 
         bytes memory branchMaskBytes = payload.getBranchMaskAsBytes();
         uint256 blockNumber = payload.getBlockNumber();
@@ -64,7 +93,10 @@ contract WithdrawToWrapperRoot {
                 payload.getReceiptLogIndex()
             )
         );
-        require(processedExits[exitHash] == false, "WITHDRAW: EXIT_ALREADY_PROCESSED");
+        require(
+            processedExits[exitHash] == false,
+            "WITHDRAW: EXIT_ALREADY_PROCESSED"
+        );
         processedExits[exitHash] = true;
 
         ExitPayloadReader.Receipt memory receipt = payload.getReceipt();
@@ -76,7 +108,12 @@ contract WithdrawToWrapperRoot {
         bytes32 receiptRoot = payload.getReceiptRoot();
         // verify receipt inclusion
         require(
-            MerklePatriciaProof.verify(receipt.toBytes(), branchMaskBytes, payload.getReceiptProof(), receiptRoot),
+            MerklePatriciaProof.verify(
+                receipt.toBytes(),
+                branchMaskBytes,
+                payload.getReceiptProof(),
+                receiptRoot
+            ),
             "WITHDRAW: INVALID_RECEIPT_PROOF"
         );
 
@@ -102,6 +139,9 @@ contract WithdrawToWrapperRoot {
         return message;
     }
 
+    /// @notice Internal function that we use to check block membership of a submitted proof
+    /// @param blockNumber Block number of proof
+    /// @param blockTime Timestamp
     function _checkBlockMembershipInCheckpoint(
         uint256 blockNumber,
         uint256 blockTime,
@@ -110,18 +150,18 @@ contract WithdrawToWrapperRoot {
         uint256 headerNumber,
         bytes memory blockProof
     ) private view returns (uint256) {
-        IRootChain.HeaderBlock memory headerBlock = rootChain.headerBlocks(headerNumber);
+        IRootChain.HeaderBlock memory headerBlock = rootChain.headerBlocks(
+            headerNumber
+        );
 
         require(
             keccak256(
-                abi.encodePacked(
-                    blockNumber, blockTime, txRoot, receiptRoot
-                )
+                abi.encodePacked(blockNumber, blockTime, txRoot, receiptRoot)
             ).checkMembership(
-                blockNumber - headerBlock.start,
-                headerBlock.root,
-                blockProof
-            ),
+                    blockNumber - headerBlock.start,
+                    headerBlock.root,
+                    blockProof
+                ),
             "WITHDRAW: INVALID_HEADER"
         );
         return headerBlock.createdAt;
