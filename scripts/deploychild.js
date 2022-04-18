@@ -17,12 +17,19 @@ async function main() {
     childChainManager = process.env.ChildChainManagerProxy;
   }
 
-  const WithdrawToWrapperChild = await hre.ethers.getContractFactory("WithdrawToWrapperChild");
-  const withdrawToWrapperChild = await WithdrawToWrapperChild.deploy(childChainManager);
+  const WithdrawToWrapperChild = await hre.ethers.getContractFactory(
+    "WithdrawToWrapperChild"
+  );
+  const withdrawToWrapperChild = await WithdrawToWrapperChild.deploy(
+    childChainManager
+  );
 
   await withdrawToWrapperChild.deployed();
 
-  console.log("WithdrawToWrapperChild deployed to:", withdrawToWrapperChild.address);
+  console.log(
+    "WithdrawToWrapperChild deployed to:",
+    withdrawToWrapperChild.address
+  );
 }
 
 main().catch((error) => {

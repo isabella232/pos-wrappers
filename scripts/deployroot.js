@@ -20,12 +20,20 @@ async function main() {
     rootChainManager = process.env.RootChainManagerProxy;
   }
 
-  const WithdrawToWrapperRoot = await hre.ethers.getContractFactory("WithdrawToWrapperRoot");
-  const withdrawToWrapperRoot = await WithdrawToWrapperRoot.deploy(rootChain, rootChainManager);
+  const WithdrawToWrapperRoot = await hre.ethers.getContractFactory(
+    "WithdrawToWrapperRoot"
+  );
+  const withdrawToWrapperRoot = await WithdrawToWrapperRoot.deploy(
+    rootChain,
+    rootChainManager
+  );
 
   await withdrawToWrapperRoot.deployed();
 
-  console.log("WithdrawToWrapperRoot deployed to:", withdrawToWrapperRoot.address);
+  console.log(
+    "WithdrawToWrapperRoot deployed to:",
+    withdrawToWrapperRoot.address
+  );
 }
 
 main().catch((error) => {

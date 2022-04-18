@@ -23,33 +23,36 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: {
-    compilers: [{
-      version: "0.8.13",
-      settings: {
-        optimizer: {
-          enabled: true,
-          runs: 9999,
+    compilers: [
+      {
+        version: "0.8.13",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 9999,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
         },
-        outputSelection: {
-          "*": {
-            "*": ["storageLayout"]
-          }
+      },
+      {
+        version: "0.6.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 9999,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
         },
-      }
-    }, {
-      version: "0.6.6",
-      settings: {
-        optimizer: {
-          enabled: true,
-          runs: 9999,
-        },
-        outputSelection: {
-          "*": {
-            "*": ["storageLayout"]
-          }
-        },
-      }
-    }],
+      },
+    ],
   },
   networks: {
     goerli: {
@@ -58,7 +61,7 @@ module.exports = {
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     mumbai: {
-      url: process.env.MUMBAI_URL || "https://rpc-mumbai.maticvigil.com",
+      url: process.env.MUMBAI_URL || "https://matic-mumbai.chainstacklabs.com",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
