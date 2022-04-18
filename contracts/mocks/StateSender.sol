@@ -1,3 +1,4 @@
+/* solhint-disable */
 // File: contracts/root/StateSender/IStateSender.sol
 
 pragma solidity 0.6.6;

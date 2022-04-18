@@ -1,3 +1,4 @@
+/* solhint-disable */
 // File: @openzeppelin/contracts/GSN/Context.sol
 
 // SPDX-License-Identifier: MIT

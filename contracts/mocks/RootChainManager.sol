@@ -1,3 +1,4 @@
+/* solhint-disable */
 // File: @openzeppxelin/contracts/math/SafeMath.sol
 
 // SPDX-License-Identifier: MIT
