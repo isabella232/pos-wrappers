@@ -19,4 +19,5 @@ jobs:
       - run: npx hardhat compile --show-stack-traces
       - run: npx hardhat test
       - run: npx solhint "contracts/**/*.sol"
+      - run: npx eslint .
       - run: npx prettier -c .

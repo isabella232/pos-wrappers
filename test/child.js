@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const chai = require("chai");
-const { ethers } = require("hardhat");
-const { FakeContract, smock } = require("@defi-wonderland/smock");
+const hre = require("hardhat");
+const { smock } = require("@defi-wonderland/smock");
 
 chai.use(smock.matchers);
 

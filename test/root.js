@@ -1,19 +1,13 @@
 const { expect } = require("chai");
 const chai = require("chai");
-const { ethers } = require("hardhat");
-const { FakeContract, smock } = require("@defi-wonderland/smock");
+const hre = require("hardhat");
+const { smock } = require("@defi-wonderland/smock");
 const proof = require("./proof.json");
 
 chai.use(smock.matchers);
 
 describe("WithdrawToWrapperChild", function () {
-  let dummyERC20,
-    rootChain,
-    rootChainManager,
-    erc20Predicate,
-    withdrawToWrapperRoot,
-    accounts,
-    account;
+  let rootChain, withdrawToWrapperRoot, accounts, account;
 
   before(async () => {
     accounts = await hre.ethers.getSigners();
@@ -60,14 +54,14 @@ describe("WithdrawToWrapperChild", function () {
       method: "hardhat_impersonateAccount",
       params: ["0xf21cdcb36b20146cd0cf7ef1629c3b084bfeea5a"],
     }); // impersonate deployer so we can deploy wrapper at the right address
-    await network.provider.send("hardhat_setBalance", [
+    await hre.network.provider.send("hardhat_setBalance", [
       "0xf21cdcb36b20146cd0cf7ef1629c3b084bfeea5a",
       "0xffffffffffffffff",
     ]);
     const withdrawToWrapperRootFactory = await hre.ethers.getContractFactory(
       "WithdrawToWrapperRoot"
     );
-    const signer = await ethers.getSigner(
+    const signer = await hre.ethers.getSigner(
       "0xf21cdcb36b20146cd0cf7ef1629c3b084bfeea5a"
     );
     const deployTxData =

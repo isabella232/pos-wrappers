@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint:sol": "npx solhint --fix \"contracts/**/*.sol\""
+    "test": "npx hardhat test",
+    "lint:sol": "npx solhint --fix \"contracts/**/*.sol\"",
+    "lint:js": "npx eslint --fix . && npx prettier -w .",
+    "lint": "npx solhint --fix \"contracts/**/*.sol\" && npx eslint --fix . && npx prettier -w ."
   },
   "repository": {
     "type": "git",
